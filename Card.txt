@@ -1,0 +1,120 @@
+//
+//  main.cpp
+//  Card
+//
+//  Created by 谭涛 on 2018/3/1.
+//  refrence:http://blog.csdn.net/u012637838/article/details/40681827
+//  Copyright © 2018年 tan. All rights reserved.
+//
+
+#include <iostream>
+#include <cstdlib>
+#include <string>
+#include <sstream>
+using namespace std;
+class MyVector{
+public:
+    int* start;
+    int* finish;
+    int* end_of_storage;
+public:
+    MyVector():start(NULL),finish(NULL),end_of_storage(NULL){}
+    MyVector(size_t n,const int& value);
+    explicit MyVector(size_t n);
+    ~MyVector() {free(start);}
+    int& front(){return *start;}
+    int& back(){return *finish;}
+    void push_back(const int& t);
+    int pop_back();
+    size_t size(){return finish - start;}
+    bool empty(){return start == finish;}
+    int& operator[] (size_t index){return *(start + index);} //reload []
+    int* get_pointer(){return start;}
+};
+
+MyVector::MyVector(size_t n,const int& value){ //constructor func
+    start = (int*)malloc(n*sizeof(int));
+    finish = start + n;
+    end_of_storage = finish;
+    for(size_t i=0;i<n;i++){
+        start[i] = value;
+    }
+}
+
+MyVector::MyVector(size_t n)
+{
+    start = (int*)malloc(n*sizeof(int));
+    finish = start + n;
+    end_of_storage = finish;
+    for(int i=0; i<n; i++) {
+        start[i] = 0;
+    }
+}
+
+void MyVector::push_back(const int& t) //put elements in the back
+{
+    if(end_of_storage != finish) {
+        *finish = t;
+        ++finish;
+    } else {
+        size_t old_size = size();
+        size_t new_size = old_size?(2*old_size):1;
+        int* new_start = (int*)malloc(new_size*sizeof(int));
+        for(int i=0; i<old_size; i++) {
+            *(new_start+i) = *(start+i);
+        }
+        *(new_start+old_size) = t;
+        start = new_start;
+        finish = start + old_size + 1;
+        end_of_storage = start + new_size;
+    }
+}
+
+int MyVector::pop_back()
+{
+    if(empty()) {
+        return NULL;
+    }
+    else {
+        return *(--finish);
+    }
+}
+
+
+int main() {
+    int n,m;
+    cin>>n>>m;
+    cin.ignore();
+    MyVector* vector = new MyVector[n];
+    for(int i=0;i<n;i++){
+        vector[i].push_back(i+1);
+    }
+    string order;
+    int ordertype;
+    int Block1,Block2;
+    int xth,kth;
+    while(m){
+        getline(cin,order);
+        istringstream istr(order);
+        istr>>ordertype;
+        switch(ordertype)
+        {
+            case 1:{
+                istr>>Block1;
+                istr>>Block2;
+                int i = vector[Block1-1].pop_back();
+                vector[Block2-1].push_back(i);
+                cout<<i<<endl;
+                break;
+            }
+            case 2:
+                istr>>xth;
+                istr>>kth;
+                cout<<vector[xth-1][kth-1]<<endl;
+                break;
+            default:
+                break;
+        }
+        m--;
+    }
+}

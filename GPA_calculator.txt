@@ -1,0 +1,96 @@
+#include <iostream>
+#include <string>
+#include <math.h>
+#include <iomanip>
+#include <sstream>
+using namespace std;
+int Search[41];
+
+class Student{
+public:
+    int SumGrade;
+    int Credits;
+    int Grade;
+    bool IsNew;
+public:
+    Student();
+    double getGrade();
+    void RefreshData(int Credit,int GP);
+};
+Student::Student(){
+    SumGrade = 0;
+    Credits = 0;
+    Grade = 0;
+    IsNew = true;
+}
+double Student::getGrade(){
+    return double(Grade)/10;
+}
+void Student::RefreshData(int Credit,int GP){
+    if(IsNew) {
+        IsNew = false;
+    }
+    else{
+        Search[Grade] -= 1;
+    }
+    SumGrade += (Credit*GP);
+    Credits += Credit;
+    Grade = (SumGrade+Credits-1)/Credits;
+    Search[Grade] += 1;
+}
+
+int Grade2GP(string &s){
+    if(s=="A+") return 40;
+    if(s=="A=") return 40;
+    if(s=="A-") return 37;
+    if(s=="B+") return 33;
+    if(s=="B=") return 30;
+    if(s=="B-") return 27;
+    if(s=="C+") return 23;
+    if(s=="C=") return 20;
+    if(s=="C-") return 17;
+    if(s=="D+") return 13;
+    if(s=="D=") return 10;
+    if(s=="F=") return 0;
+    return 0;
+};
+
+int main() {
+    int NumOfStu, NumOfEve;
+    cin>>NumOfStu>>NumOfEve;
+    cin.ignore();
+    Student *StuList = new Student[NumOfStu];
+    string order;
+    int ID;             //student number
+    int Credit;         //Credit of each class
+    string level;       //level eg:A+
+    while(NumOfEve){
+        getline(cin,order);
+        istringstream istr(order);
+        int type;           //order type
+        istr>>type;
+        switch (type) {
+            case 1:
+            {
+                istr>>ID;
+                istr>>Credit;
+                istr>>level;
+                StuList[ID-1].RefreshData(Credit,Grade2GP(level));
+                break;
+            }
+            case 2:
+                istr>>ID;
+                cout<<setiosflags(ios::fixed)<<setprecision(1)<<StuList[ID-1].getGrade()<<endl;
+                break;
+            case 3:
+                double input;
+                istr>>input;
+                int number = input*10;
+                cout<<Search[number]<<endl;
+                break;
+            defult:
+                break;
+        }
+        NumOfEve--;
+    }
+}
